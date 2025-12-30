@@ -1,0 +1,60 @@
+#pragma once
+
+#include "core/Window.hpp"
+#include "utils/Types.hpp"
+
+#include <SDL3/SDL.h>
+
+#include <memory>
+
+namespace pacman {
+
+struct SpriteRegion;
+
+class Renderer {
+public:
+    explicit Renderer(const Window& window);
+    ~Renderer() = default;
+
+    // Non-copyable
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+
+    // Movable
+    Renderer(Renderer&&) noexcept = default;
+    Renderer& operator=(Renderer&&) noexcept = default;
+
+    [[nodiscard]] SDL_Renderer* get() const { return m_renderer.get(); }
+    [[nodiscard]] bool isValid() const { return m_renderer != nullptr; }
+
+    void clear();
+    void present();
+
+    void setDrawColor(u8 r, u8 g, u8 b, u8 a = 255);
+    void setDrawColor(u32 rgba);
+
+    void drawRect(i32 x, i32 y, i32 w, i32 h);
+    void fillRect(i32 x, i32 y, i32 w, i32 h);
+    void drawLine(i32 x1, i32 y1, i32 x2, i32 y2);
+    void drawPoint(i32 x, i32 y);
+
+    // Texture rendering
+    void drawTexture(SDL_Texture* texture, i32 x, i32 y);
+    void drawTexture(SDL_Texture* texture, i32 x, i32 y, i32 w, i32 h);
+    void drawTextureRegion(SDL_Texture* texture, const SpriteRegion& region, i32 x, i32 y);
+    void drawTextureRegion(SDL_Texture* texture, const SpriteRegion& region, i32 x, i32 y, i32 w,
+                           i32 h);
+
+private:
+    struct RendererDeleter {
+        void operator()(SDL_Renderer* renderer) const {
+            if (renderer) {
+                SDL_DestroyRenderer(renderer);
+            }
+        }
+    };
+
+    std::unique_ptr<SDL_Renderer, RendererDeleter> m_renderer;
+};
+
+}  // namespace pacman
