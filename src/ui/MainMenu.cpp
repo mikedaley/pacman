@@ -141,11 +141,6 @@ void MainMenu::updateChaseSequence(f32 deltaTime) {
             m_pacmanSprite.setPosition(m_pacmanChaseX, CHASE_Y);
             m_blinkySprite.setPosition(m_ghostChaseX, CHASE_Y);
 
-            // Update animation to face left
-            m_blinkySprite.setAnimationFrames({"blinky_left_0", "blinky_left_1"});
-            m_pacmanSprite.setAnimationFrames(
-                {"pacman_closed", "pacman_left_half", "pacman_left_open", "pacman_left_half"});
-
             // When both exit screen left, switch to phase 2
             if (m_ghostChaseX < -20.0f) {
                 m_chasePhase = ChasePhase::SuperPacmanChasesBlinky;
@@ -203,6 +198,13 @@ void MainMenu::startChaseSequence() {
     // Start from right side of screen
     m_pacmanChaseX = static_cast<f32>(constants::GAME_WIDTH) - 40.0f;
     m_ghostChaseX = static_cast<f32>(constants::GAME_WIDTH);
+
+    // Set up animations for chase (facing left)
+    m_blinkySprite.setAnimationFrames({"blinky_left_0", "blinky_left_1"});
+    m_blinkySprite.setAnimationSpeed(GHOST_ANIM_SPEED);
+    m_pacmanSprite.setAnimationFrames(
+        {"pacman_closed", "pacman_left_half", "pacman_left_open", "pacman_left_half"});
+    m_pacmanSprite.setAnimationSpeed(10.0f);
 }
 
 void MainMenu::render(Renderer& renderer) {
