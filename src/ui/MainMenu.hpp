@@ -9,8 +9,16 @@ namespace pacman {
 
 class Renderer;
 
-// Main menu screen for Pac-Man
-// Displays title, character introductions, and player selection
+// Attract mode states
+enum class AttractState {
+    CharacterIntro,  // Show ghost names and nicknames one at a time
+    PelletPoints,    // Show pellet point values
+    ChaseSequence,   // Blinky chases Pac-Man, then Super Pac-Man chases frightened Blinky
+    PlayerSelect     // Show player selection
+};
+
+// Main menu screen for Pac-Man (US version attract mode)
+// Cycles through: Character intro -> Pellet points -> Chase sequence -> Player select
 class MainMenu {
 public:
     MainMenu(TextureAtlas& atlas, BitmapFont& font);
@@ -38,10 +46,18 @@ public:
     void reset();
 
 private:
-    void renderTitle(Renderer& renderer);
-    void renderCharacterShowcase(Renderer& renderer);
-    void renderPlayerSelection(Renderer& renderer);
+    void updateCharacterIntro(f32 deltaTime);
+    void updateChaseSequence(f32 deltaTime);
+
+    void renderHeader(Renderer& renderer);
+    void renderCharacterIntro(Renderer& renderer);
+    void renderPelletPoints(Renderer& renderer);
+    void renderChaseSequence(Renderer& renderer);
+    void renderPlayerSelect(Renderer& renderer);
     void renderCredits(Renderer& renderer);
+
+    void advanceToNextState();
+    void startChaseSequence();
 
     TextureAtlas& m_atlas;
     BitmapFont& m_font;
@@ -52,14 +68,36 @@ private:
     Sprite m_inkySprite;
     Sprite m_clydeSprite;
     Sprite m_pacmanSprite;
+    Sprite m_superPacmanSprite;  // Large Pac-Man for chase sequence
+    Sprite m_frightenedGhostSprite;
+
+    // Attract mode state
+    AttractState m_state{AttractState::CharacterIntro};
+    f32 m_stateTimer{0.0f};
+    i32 m_characterIndex{0};  // Which ghost is being introduced (0-3)
+
+    // Chase sequence state
+    enum class ChasePhase { BlinkyChasesPacman, SuperPacmanChasesBlinky, Done };
+    ChasePhase m_chasePhase{ChasePhase::BlinkyChasesPacman};
+    f32 m_pacmanChaseX{0.0f};  // Pac-Man X in chase
+    f32 m_ghostChaseX{0.0f};   // Ghost X in chase
 
     // Menu state
-    i32 m_selectedPlayers{1};  // 1 or 2 players
+    i32 m_selectedPlayers{1};
     f32 m_blinkTimer{0.0f};
     bool m_showCursor{true};
+    f32 m_powerPelletTimer{0.0f};
+    bool m_showPowerPellet{true};
 
-    // Animation constants
+    // Timing constants
+    static constexpr f32 CHARACTER_REVEAL_TIME = 0.5f;   // Time between each ghost appearing
+    static constexpr f32 CHARACTER_DISPLAY_TIME = 3.0f;  // Total time to show all characters
+    static constexpr f32 PELLET_DISPLAY_TIME = 2.0f;     // Time to show pellet points
+    static constexpr f32 CHASE_SPEED = 80.0f;            // Pixels per second
+    static constexpr f32 SUPER_PACMAN_SPEED = 120.0f;    // Super Pac-Man is faster
+    static constexpr f32 PLAYER_SELECT_TIME = 5.0f;      // Time on player select before looping
     static constexpr f32 BLINK_INTERVAL = 0.3f;
+    static constexpr f32 POWER_PELLET_BLINK = 0.2f;
     static constexpr f32 GHOST_ANIM_SPEED = 6.0f;
 };
 
