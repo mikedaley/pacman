@@ -152,15 +152,16 @@ void MainMenu::updateChaseSequence(f32 deltaTime) {
 
         case ChasePhase::SuperPacmanChasesBlinky:
             // Super Pac-Man chases frightened Blinky to the right
-            m_pacmanChaseX += SUPER_PACMAN_SPEED * deltaTime;
+            // Both move at same speed to maintain spacing
+            m_pacmanChaseX += CHASE_SPEED * deltaTime;
             m_ghostChaseX += CHASE_SPEED * deltaTime;
 
             // Super Pac-Man is 32x32, so offset Y to center with ghost
             m_superPacmanSprite.setPosition(m_pacmanChaseX, CHASE_Y - 8.0f);
             m_frightenedGhostSprite.setPosition(m_ghostChaseX, CHASE_Y);
 
-            // When both exit screen right, advance state
-            if (m_pacmanChaseX > SCREEN_WIDTH + 40.0f) {
+            // When ghost exits screen right, advance state
+            if (m_ghostChaseX > SCREEN_WIDTH + 20.0f) {
                 m_chasePhase = ChasePhase::Done;
                 advanceToNextState();
             }
