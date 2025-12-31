@@ -105,7 +105,7 @@ void Player::setDesiredDirection(Direction dir) {
 }
 
 void Player::reset() {
-    m_position.x = 100.0f;
+    m_position.x = 104.0f;
     m_position.y = 180.0f + constants::MAZE_OFFSET_Y;
     m_direction = Direction::None;
     m_desiredDirection = Direction::None;

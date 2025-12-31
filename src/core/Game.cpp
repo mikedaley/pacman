@@ -46,6 +46,8 @@ Game::Game() {
 
     // Create ghosts
     m_blinky = std::make_unique<Blinky>(*m_spriteAtlas, *m_maze);
+    m_pinky = std::make_unique<Pinky>(*m_spriteAtlas, *m_maze);
+    m_inky = std::make_unique<Inky>(*m_spriteAtlas, *m_maze, *m_blinky);
     m_clyde = std::make_unique<Clyde>(*m_spriteAtlas, *m_maze);
 
     // Create score popup for displaying points when eating ghosts/fruit
@@ -60,6 +62,8 @@ Game::~Game() {
     m_mainMenu.reset();
     m_scorePopup.reset();
     m_clyde.reset();
+    m_inky.reset();
+    m_pinky.reset();
     m_blinky.reset();
     m_lifeSprite.reset();
     m_player.reset();
@@ -251,6 +255,14 @@ void Game::update(f32 deltaTime) {
 
         // Check if any ghosts should be released from the house
         // Release ghosts when their dot limit is reached
+        if (m_pinky->getState() == GhostState::InHouse &&
+            m_dotsEatenThisLife >= m_pinky->getDotLimit()) {
+            m_pinky->releaseFromHouse();
+        }
+        if (m_inky->getState() == GhostState::InHouse &&
+            m_dotsEatenThisLife >= m_inky->getDotLimit()) {
+            m_inky->releaseFromHouse();
+        }
         if (m_clyde->getState() == GhostState::InHouse &&
             m_dotsEatenThisLife >= m_clyde->getDotLimit()) {
             m_clyde->releaseFromHouse();
@@ -259,17 +271,24 @@ void Game::update(f32 deltaTime) {
         // Power pellet triggers frightened mode
         if (points == constants::SCORE_POWER_PELLET) {
             m_blinky->setFrightened();
+            m_pinky->setFrightened();
+            m_inky->setFrightened();
             m_clyde->setFrightened();
         }
     }
 
     // Update ghosts
-    m_blinky->update(deltaTime, m_player->getTile());
-    m_clyde->update(deltaTime, m_player->getTile());
+    Vec2i pacmanTile = m_player->getTile();
+    Direction pacmanDir = m_player->getDirection();
+    m_blinky->update(deltaTime, pacmanTile, pacmanDir);
+    m_pinky->update(deltaTime, pacmanTile, pacmanDir);
+    m_inky->update(deltaTime, pacmanTile, pacmanDir);
+    m_clyde->update(deltaTime, pacmanTile, pacmanDir);
 
     // Reset ghost eaten counter when no ghosts are frightened anymore
     // (Power pellet effect has worn off)
-    if (m_ghostsEatenThisEnergizer > 0 && !m_blinky->isFrightened() && !m_clyde->isFrightened()) {
+    if (m_ghostsEatenThisEnergizer > 0 && !m_blinky->isFrightened() && !m_pinky->isFrightened() &&
+        !m_inky->isFrightened() && !m_clyde->isFrightened()) {
         m_ghostsEatenThisEnergizer = 0;
     }
 
@@ -344,6 +363,12 @@ void Game::render() {
         if (!m_blinky->isEaten()) {
             m_blinky->render(*m_renderer);
         }
+        if (!m_pinky->isEaten()) {
+            m_pinky->render(*m_renderer);
+        }
+        if (!m_inky->isEaten()) {
+            m_inky->render(*m_renderer);
+        }
         if (!m_clyde->isEaten()) {
             m_clyde->render(*m_renderer);
         }
@@ -390,7 +415,7 @@ void Game::checkGhostCollision() {
     Vec2i playerTile = m_player->getTile();
 
     // Check collision with each ghost
-    Ghost* ghosts[] = {m_blinky.get(), m_clyde.get()};
+    Ghost* ghosts[] = {m_blinky.get(), m_pinky.get(), m_inky.get(), m_clyde.get()};
 
     for (Ghost* ghost : ghosts) {
         Vec2i ghostTile = ghost->getTile();
@@ -444,10 +469,17 @@ void Game::resetPositions() {
 
     // Reset ghosts to starting positions
     m_blinky->reset();
+    m_pinky->reset();
+    m_inky->reset();
     m_clyde->reset();
 
     // Reset dot counter for ghost release
     m_dotsEatenThisLife = 0;
+
+    // Release ghosts with dot limit of 0 immediately
+    if (m_pinky->getDotLimit() == 0) {
+        m_pinky->releaseFromHouse();
+    }
 }
 
 void Game::startNewGame() {

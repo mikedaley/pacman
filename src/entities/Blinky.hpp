@@ -14,7 +14,7 @@ public:
 
 protected:
     // Blinky targets Pacman's exact position
-    [[nodiscard]] Vec2i getChaseTarget(Vec2i pacmanTile) const override;
+    [[nodiscard]] Vec2i getChaseTarget(Vec2i pacmanTile, Direction pacmanDir) const override;
 
     // Scatter target: top-right corner
     [[nodiscard]] Vec2i getScatterTarget() const override;

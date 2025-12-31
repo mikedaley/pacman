@@ -17,11 +17,11 @@ public:
     [[nodiscard]] bool startsInHouse() const override { return true; }
 
     // Clyde's dot limit to leave house (60 on level 1)
-    [[nodiscard]] i32 getDotLimit() const override { return 60; }
+    [[nodiscard]] i32 getDotLimit() const override { return 1; }  // TODO: restore to 60
 
 protected:
     // Clyde targets Pacman when far, scatter corner when close
-    [[nodiscard]] Vec2i getChaseTarget(Vec2i pacmanTile) const override;
+    [[nodiscard]] Vec2i getChaseTarget(Vec2i pacmanTile, Direction pacmanDir) const override;
 
     // Scatter target: bottom-left corner
     [[nodiscard]] Vec2i getScatterTarget() const override;

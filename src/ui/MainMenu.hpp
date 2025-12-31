@@ -74,7 +74,7 @@ private:
     // Attract mode state
     AttractState m_state{AttractState::CharacterIntro};
     f32 m_stateTimer{0.0f};
-    i32 m_characterIndex{0};  // Which ghost is being introduced (0-3)
+    i32 m_introStep{0};  // Current step in character intro (0-11: 3 steps per ghost x 4 ghosts)
 
     // Chase sequence state
     enum class ChasePhase { BlinkyChasesPacman, SuperPacmanChasesBlinky, Done };
@@ -90,12 +90,12 @@ private:
     bool m_showPowerPellet{true};
 
     // Timing constants
-    static constexpr f32 CHARACTER_REVEAL_TIME = 0.5f;   // Time between each ghost appearing
-    static constexpr f32 CHARACTER_DISPLAY_TIME = 3.0f;  // Total time to show all characters
-    static constexpr f32 PELLET_DISPLAY_TIME = 2.0f;     // Time to show pellet points
-    static constexpr f32 CHASE_SPEED = 80.0f;            // Pixels per second
-    static constexpr f32 SUPER_PACMAN_SPEED = 120.0f;    // Super Pac-Man is faster
-    static constexpr f32 PLAYER_SELECT_TIME = 5.0f;      // Time on player select before looping
+    static constexpr f32 INTRO_STEP_TIME = 0.75f;      // Time between each intro step
+    static constexpr f32 INTRO_HOLD_TIME = 2.0f;       // Time to hold after all ghosts shown
+    static constexpr f32 PELLET_DISPLAY_TIME = 3.0f;   // Time to show pellet points
+    static constexpr f32 CHASE_SPEED = 80.0f;          // Pixels per second
+    static constexpr f32 SUPER_PACMAN_SPEED = 120.0f;  // Super Pac-Man is faster
+    static constexpr f32 PLAYER_SELECT_TIME = 8.0f;    // Time on player select before looping
     static constexpr f32 BLINK_INTERVAL = 0.3f;
     static constexpr f32 POWER_PELLET_BLINK = 0.2f;
     static constexpr f32 GHOST_ANIM_SPEED = 6.0f;

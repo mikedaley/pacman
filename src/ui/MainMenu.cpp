@@ -115,15 +115,19 @@ void MainMenu::update(f32 deltaTime) {
 }
 
 void MainMenu::updateCharacterIntro([[maybe_unused]] f32 deltaTime) {
-    // Reveal ghosts one at a time
-    i32 newCharacterIndex = static_cast<i32>(m_stateTimer / CHARACTER_REVEAL_TIME);
-    if (newCharacterIndex > 4) {
-        newCharacterIndex = 4;  // Cap at 4 (all ghosts shown)
-    }
-    m_characterIndex = newCharacterIndex;
+    // Each ghost has 3 steps: sprite, character name, nickname
+    // Total of 12 steps for 4 ghosts
+    constexpr i32 TOTAL_STEPS = 12;
 
-    // After all characters shown, wait a bit then advance
-    if (m_stateTimer >= CHARACTER_DISPLAY_TIME) {
+    i32 newStep = static_cast<i32>(m_stateTimer / INTRO_STEP_TIME);
+    if (newStep > TOTAL_STEPS) {
+        newStep = TOTAL_STEPS;
+    }
+    m_introStep = newStep;
+
+    // After all steps complete, wait a bit then advance
+    f32 totalIntroTime = TOTAL_STEPS * INTRO_STEP_TIME + INTRO_HOLD_TIME;
+    if (m_stateTimer >= totalIntroTime) {
         advanceToNextState();
     }
 }
@@ -190,7 +194,7 @@ void MainMenu::advanceToNextState() {
         case AttractState::PlayerSelect:
             // Loop back to character intro
             m_state = AttractState::CharacterIntro;
-            m_characterIndex = 0;
+            m_introStep = 0;
             break;
     }
 }
@@ -253,45 +257,63 @@ void MainMenu::renderCharacterIntro(Renderer& renderer) {
     constexpr i32 characterX = 56;
     constexpr i32 nicknameX = 128;
 
-    // Each ghost appears one at a time
+    // Each ghost has 3 steps: sprite (step 0), character name (step 1), nickname (step 2)
+    // Blinky: steps 0-2, Pinky: steps 3-5, Inky: steps 6-8, Clyde: steps 9-11
+
     // Blinky - "SHADOW" "BLINKY" (Red)
-    if (m_characterIndex >= 1) {
+    if (m_introStep >= 1) {
         m_blinkySprite.setPosition(static_cast<f32>(spriteX), static_cast<f32>(startY));
         m_blinkySprite.render(renderer);
+    }
+    if (m_introStep >= 2) {
         m_font.drawText(renderer, "-", dashX, startY + 4, FontColor::Red);
         m_font.drawText(renderer, "SHADOW", characterX, startY + 4, FontColor::Red);
+    }
+    if (m_introStep >= 3) {
         m_font.drawText(renderer, "\"BLINKY\"", nicknameX, startY + 4, FontColor::Red);
     }
 
     // Pinky - "SPEEDY" "PINKY" (Pink)
-    if (m_characterIndex >= 2) {
+    if (m_introStep >= 4) {
         m_pinkySprite.setPosition(static_cast<f32>(spriteX), static_cast<f32>(startY + lineHeight));
         m_pinkySprite.render(renderer);
+    }
+    if (m_introStep >= 5) {
         m_font.drawText(renderer, "-", dashX, startY + lineHeight + 4, FontColor::Pink);
         m_font.drawText(renderer, "SPEEDY", characterX, startY + lineHeight + 4, FontColor::Pink);
+    }
+    if (m_introStep >= 6) {
         m_font.drawText(renderer, "\"PINKY\"", nicknameX, startY + lineHeight + 4, FontColor::Pink);
     }
 
     // Inky - "BASHFUL" "INKY" (Cyan)
-    if (m_characterIndex >= 3) {
+    if (m_introStep >= 7) {
         m_inkySprite.setPosition(static_cast<f32>(spriteX),
                                  static_cast<f32>(startY + lineHeight * 2));
         m_inkySprite.render(renderer);
+    }
+    if (m_introStep >= 8) {
         m_font.drawText(renderer, "-", dashX, startY + lineHeight * 2 + 4, FontColor::Cyan);
         m_font.drawText(renderer, "BASHFUL", characterX, startY + lineHeight * 2 + 4,
                         FontColor::Cyan);
+    }
+    if (m_introStep >= 9) {
         m_font.drawText(renderer, "\"INKY\"", nicknameX, startY + lineHeight * 2 + 4,
                         FontColor::Cyan);
     }
 
     // Clyde - "POKEY" "CLYDE" (Orange)
-    if (m_characterIndex >= 4) {
+    if (m_introStep >= 10) {
         m_clydeSprite.setPosition(static_cast<f32>(spriteX),
                                   static_cast<f32>(startY + lineHeight * 3));
         m_clydeSprite.render(renderer);
+    }
+    if (m_introStep >= 11) {
         m_font.drawText(renderer, "-", dashX, startY + lineHeight * 3 + 4, FontColor::Orange);
         m_font.drawText(renderer, "POKEY", characterX, startY + lineHeight * 3 + 4,
                         FontColor::Orange);
+    }
+    if (m_introStep >= 12) {
         m_font.drawText(renderer, "\"CLYDE\"", nicknameX, startY + lineHeight * 3 + 4,
                         FontColor::Orange);
     }
@@ -302,12 +324,12 @@ void MainMenu::renderPelletPoints(Renderer& renderer) {
 
     // Draw pellet and power pellet with their point values
     const auto& pelletRegion = m_atlas.getRegion("pellet");
-    renderer.drawTextureRegion(m_atlas.getTexture(), pelletRegion, 56, pelletY + 4);
+    renderer.drawTextureRegion(m_atlas.getTexture(), pelletRegion, 56, pelletY);
     m_font.drawText(renderer, "10 PTS", 80, pelletY, FontColor::White);
 
     if (m_showPowerPellet) {
         const auto& powerPelletRegion = m_atlas.getRegion("power_pellet");
-        renderer.drawTextureRegion(m_atlas.getTexture(), powerPelletRegion, 56, pelletY + 20);
+        renderer.drawTextureRegion(m_atlas.getTexture(), powerPelletRegion, 56, pelletY + 16);
     }
     m_font.drawText(renderer, "50 PTS", 80, pelletY + 16, FontColor::White);
 }
@@ -362,7 +384,7 @@ void MainMenu::renderCredits(Renderer& renderer) {
 void MainMenu::reset() {
     m_state = AttractState::CharacterIntro;
     m_stateTimer = 0.0f;
-    m_characterIndex = 0;
+    m_introStep = 0;
     m_chasePhase = ChasePhase::BlinkyChasesPacman;
     m_selectedPlayers = 1;
     m_blinkTimer = 0.0f;

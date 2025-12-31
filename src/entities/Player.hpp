@@ -32,6 +32,7 @@ public:
 
     // Direction control
     void setDesiredDirection(Direction dir);
+    [[nodiscard]] Direction getDirection() const { return m_direction; }
 
     // Reset player to starting position
     void reset();

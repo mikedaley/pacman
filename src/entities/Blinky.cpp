@@ -6,7 +6,7 @@ Blinky::Blinky(TextureAtlas& atlas, const Maze& maze) : Ghost(atlas, maze, "Blin
     reset();
 }
 
-Vec2i Blinky::getChaseTarget(Vec2i pacmanTile) const {
+Vec2i Blinky::getChaseTarget(Vec2i pacmanTile, [[maybe_unused]] Direction pacmanDir) const {
     // Blinky directly targets Pacman's current tile
     return pacmanTile;
 }
@@ -21,13 +21,9 @@ std::string Blinky::getSpriteName() const {
 }
 
 Vec2f Blinky::getStartPosition() const {
-    // Blinky starts just above the ghost house, centered horizontally
-    // The ghost house door is at row 12, so Blinky starts at row 11
-    // Tile (13, 11) in maze coordinates
-    // Sprite is 16x16, position is top-left corner
-    // Tile center: (13 * 8 + 4, 11 * 8 + 4) = (108, 92) in maze coords
-    // Top-left of sprite: (108 - 8, 92 - 8) = (100, 84) in maze coords
-    // Add MAZE_OFFSET_Y for screen coords: (100, 84 + 24) = (100, 108)
+    // Original Pac-Man: Blinky at tile (13.5, 11) - above ghost house door
+    // Center: (13.5 * 8, 11 * 8 + 4) = (108, 92) in maze coords
+    // Top-left of 16x16 sprite: (108 - 8, 92 - 8) = (100, 84)
     return Vec2f{100.0f, 84.0f + constants::MAZE_OFFSET_Y};
 }
 

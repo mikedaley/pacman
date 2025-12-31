@@ -5,6 +5,8 @@
 #include "entities/Blinky.hpp"
 #include "entities/Clyde.hpp"
 #include "entities/Ghost.hpp"
+#include "entities/Inky.hpp"
+#include "entities/Pinky.hpp"
 #include "entities/Player.hpp"
 #include "graphics/BitmapFont.hpp"
 #include "graphics/ScorePopup.hpp"
@@ -45,6 +47,8 @@ private:
     std::unique_ptr<Player> m_player;
     std::unique_ptr<Sprite> m_lifeSprite;
     std::unique_ptr<Blinky> m_blinky;
+    std::unique_ptr<Pinky> m_pinky;
+    std::unique_ptr<Inky> m_inky;
     std::unique_ptr<Clyde> m_clyde;
     std::unique_ptr<ScorePopup> m_scorePopup;
     std::unique_ptr<MainMenu> m_mainMenu;

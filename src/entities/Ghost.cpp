@@ -12,7 +12,7 @@ Ghost::Ghost(TextureAtlas& atlas, const Maze& maze, std::string_view name)
     m_sprite.setAnimationSpeed(10.0f);
 }
 
-void Ghost::update(f32 deltaTime, Vec2i pacmanTile) {
+void Ghost::update(f32 deltaTime, Vec2i pacmanTile, Direction pacmanDir) {
     // Update state timer
     m_stateTimer += deltaTime;
 
@@ -47,30 +47,36 @@ void Ghost::update(f32 deltaTime, Vec2i pacmanTile) {
 
     // Handle LeavingHouse state - ghost moves to center then up through door
     if (m_state == GhostState::LeavingHouse) {
-        constexpr f32 EXIT_SPEED = 60.0f;  // pixels per second
-        f32 targetX = HOUSE_EXIT_X * constants::TILE_SIZE;
+        constexpr f32 EXIT_SPEED = 30.0f;  // pixels per second (slower than normal)
+        f32 targetX = HOUSE_EXIT_X * constants::TILE_SIZE;  // 108 pixels (center of door)
         f32 targetY = HOUSE_EXIT_Y * constants::TILE_SIZE + constants::MAZE_OFFSET_Y;
         f32 centerX = m_position.x + 8.0f;
         f32 centerY = m_position.y + 8.0f;
 
-        // First move to center X
-        if (std::abs(centerX - targetX) > 1.0f) {
+        // First move to center X (door position)
+        f32 distToTargetX = std::abs(centerX - targetX);
+        if (distToTargetX > 0.5f) {
+            f32 moveAmount = EXIT_SPEED * deltaTime;
+            if (moveAmount > distToTargetX) {
+                moveAmount = distToTargetX;  // Don't overshoot
+            }
             if (centerX < targetX) {
-                m_position.x += EXIT_SPEED * deltaTime;
+                m_position.x += moveAmount;
                 m_direction = Direction::Right;
             } else {
-                m_position.x -= EXIT_SPEED * deltaTime;
+                m_position.x -= moveAmount;
                 m_direction = Direction::Left;
             }
         }
         // Then move up to exit
         else if (centerY > targetY) {
-            m_position.x = targetX - 8.0f;  // Snap to center
+            m_position.x = targetX - 8.0f;  // Snap to exact center
             m_position.y -= EXIT_SPEED * deltaTime;
             m_direction = Direction::Up;
         }
         // Reached exit position
         else {
+            m_position.x = targetX - 8.0f;  // Ensure centered on door
             m_position.y = targetY - 8.0f;  // Snap to exit position
             m_state = GhostState::Scatter;
             m_stateTimer = 0.0f;
@@ -135,7 +141,7 @@ void Ghost::update(f32 deltaTime, Vec2i pacmanTile) {
             targetTile = getScatterTarget();
             break;
         case GhostState::Chase:
-            targetTile = getChaseTarget(pacmanTile);
+            targetTile = getChaseTarget(pacmanTile, pacmanDir);
             break;
         case GhostState::Frightened:
             // In frightened mode, make random turns at intersections
@@ -145,8 +151,8 @@ void Ghost::update(f32 deltaTime, Vec2i pacmanTile) {
             // Ghost just eaten, game is paused - don't move
             return;
         case GhostState::Eyes:
-            // Return to ghost house
-            targetTile = Vec2i{13, 14};  // Ghost house entrance
+            // Return to ghost house - target tile 14 (door is at tiles 13-14)
+            targetTile = Vec2i{14, 14};  // Ghost house entrance
             break;
     }
 
@@ -250,13 +256,32 @@ void Ghost::update(f32 deltaTime, Vec2i pacmanTile) {
 
     // Check if eyes have reached the ghost house (after movement)
     if (m_state == GhostState::Eyes) {
-        Vec2i eyesTile = getTile();
-        // Ghost house door is at row 12, tiles 13-14
-        // Eyes need to enter through the door and reach inside
-        if (eyesTile.y >= 13 && eyesTile.y <= 15 && eyesTile.x >= 12 && eyesTile.x <= 15) {
-            // Respawn as normal ghost - transition to leaving house
-            m_state = GhostState::LeavingHouse;
+        constexpr f32 HALF_SPRITE = 8.0f;
+        f32 centerX = m_position.x + HALF_SPRITE;
+        f32 centerY = m_position.y + HALF_SPRITE - constants::MAZE_OFFSET_Y;
+        f32 houseCenterX = HOUSE_EXIT_X * constants::TILE_SIZE;
+        f32 houseCenterY = HOUSE_CENTER_Y * constants::TILE_SIZE + constants::TILE_SIZE / 2;
+
+        // Eyes must reach inside the ghost house before respawning
+        // Check both X (must be near house center) and Y (must be inside house at row 14)
+        bool atHouseCenterX = std::abs(centerX - houseCenterX) < 4.0f;
+        bool atHouseCenterY = centerY >= houseCenterY - 2.0f;
+
+        if (atHouseCenterX && atHouseCenterY) {
+            // Respawn at ghost's starting position
+            Vec2f startPos = getStartPosition();
+            m_position = startPos;
+
+            // Ghosts that start in house go to LeavingHouse, others go directly to Scatter
+            if (startsInHouse()) {
+                m_state = GhostState::LeavingHouse;
+                m_bouncingUp = true;
+            } else {
+                // Blinky starts outside, so go directly to scatter
+                m_state = GhostState::Scatter;
+            }
             m_stateTimer = 0.0f;
+            m_lastDecisionTile = Vec2i{-1, -1};
             updateAnimation();
         }
     }
@@ -301,6 +326,8 @@ void Ghost::transitionToEyes() {
     // Called after the eaten pause ends, ghost becomes eyes returning home
     m_state = GhostState::Eyes;
     m_stateTimer = 0.0f;
+    // Reset decision tile so ghost recalculates direction immediately
+    m_lastDecisionTile = Vec2i{-1, -1};
     updateAnimation();
 }
 
@@ -321,24 +348,22 @@ void Ghost::reset() {
     if (startsInHouse()) {
         m_state = GhostState::InHouse;
         m_direction = Direction::Up;  // Start bouncing up
+        // Don't snap to tile center - use exact start position for ghosts in house
+        m_lastDecisionTile = Vec2i{-1, -1};
     } else {
         m_state = GhostState::Scatter;  // Start in scatter mode
         m_direction = Direction::Left;  // Initial direction
+
+        // Snap to tile center for ghosts outside the house
+        constexpr f32 HALF_SPRITE = 8.0f;
+        f32 centerX = m_position.x + HALF_SPRITE;
+        f32 centerY = m_position.y + HALF_SPRITE - constants::MAZE_OFFSET_Y;
+        Vec2i currentTile = Maze::pixelToTile(centerX, centerY);
+        Vec2f tileCenter = getTileCenter(currentTile.x, currentTile.y);
+        m_position.x = tileCenter.x - HALF_SPRITE;
+        m_position.y = tileCenter.y - HALF_SPRITE;
+        m_lastDecisionTile = currentTile;
     }
-
-    // Snap to tile center and record as decision tile
-    constexpr f32 HALF_SPRITE = 8.0f;
-    f32 centerX = m_position.x + HALF_SPRITE;
-    f32 centerY = m_position.y + HALF_SPRITE - constants::MAZE_OFFSET_Y;
-    Vec2i currentTile = Maze::pixelToTile(centerX, centerY);
-    Vec2f tileCenter = getTileCenter(currentTile.x, currentTile.y);
-
-    // Snap position to exact tile center
-    m_position.x = tileCenter.x - HALF_SPRITE;
-    m_position.y = tileCenter.y - HALF_SPRITE;
-
-    // Mark this tile as already decided so we move immediately
-    m_lastDecisionTile = currentTile;
 
     m_sprite.setPosition(m_position);
     updateAnimation();

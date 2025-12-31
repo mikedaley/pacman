@@ -36,7 +36,7 @@ public:
     Ghost& operator=(Ghost&&) = delete;
 
     // Update ghost position and animation
-    void update(f32 deltaTime, Vec2i pacmanTile);
+    void update(f32 deltaTime, Vec2i pacmanTile, Direction pacmanDir = Direction::Left);
 
     // Render the ghost
     void render(Renderer& renderer);
@@ -68,7 +68,7 @@ public:
 
 protected:
     // Override in derived classes to provide AI target
-    [[nodiscard]] virtual Vec2i getChaseTarget(Vec2i pacmanTile) const = 0;
+    [[nodiscard]] virtual Vec2i getChaseTarget(Vec2i pacmanTile, Direction pacmanDir) const = 0;
     [[nodiscard]] virtual Vec2i getScatterTarget() const = 0;
 
     // Get the sprite name prefix for this ghost (e.g., "blinky", "pinky")
@@ -109,8 +109,9 @@ protected:
     bool m_bouncingUp{false};                        // Direction of bounce in house
     static constexpr f32 HOUSE_CENTER_Y = 14.0f;     // Center row of ghost house
     static constexpr f32 HOUSE_BOUNCE_RANGE = 0.5f;  // Tiles to bounce up/down
-    static constexpr f32 HOUSE_EXIT_X = 13.5f;       // X position to exit (between tiles 13-14)
-    static constexpr f32 HOUSE_EXIT_Y = 11.0f;       // Y position above door
+    static constexpr f32 HOUSE_EXIT_X =
+        14.0f;  // X position to exit (center of door at tiles 13-14)
+    static constexpr f32 HOUSE_EXIT_Y = 11.0f;  // Y position above door
 };
 
 }  // namespace pacman

@@ -31,7 +31,7 @@ inline constexpr f32 BASE_SPEED = 75.75757625f;
 // Pacman settings (Level 1: 80% speed)
 inline constexpr f32 PACMAN_SPEED = BASE_SPEED * 0.80f;  // ~60.6 pixels per second
 inline constexpr i32 PACMAN_START_LIVES = 3;
-inline constexpr f32 PACMAN_ANIM_SPEED = 20.0f;  // frames per second (chomps ~7.5 times/sec)
+inline constexpr f32 PACMAN_ANIM_SPEED = 15.0f;  // frames per second (chomps ~7.5 times/sec)
 
 // Ghost settings (Level 1 speeds from original game)
 inline constexpr f32 GHOST_SPEED = BASE_SPEED * 0.75f;             // ~56.8 pixels/sec (75%)
