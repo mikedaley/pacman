@@ -59,9 +59,6 @@ public:
     // Eat pellet at position, returns points earned (0 if no pellet)
     i32 eatPellet(i32 x, i32 y);
 
-    // Get remaining pellet count
-    [[nodiscard]] i32 getPelletCount() const { return m_pelletCount; }
-
     // Update animations (power pellet flashing)
     void update(f32 deltaTime);
 
@@ -70,11 +67,6 @@ public:
 
     // Convert pixel position to tile position
     [[nodiscard]] static Vec2i pixelToTile(f32 x, f32 y);
-    [[nodiscard]] static Vec2i pixelToTile(Vec2f pos);
-
-    // Convert tile position to pixel position (top-left of tile)
-    [[nodiscard]] static Vec2f tileToPixel(i32 x, i32 y);
-    [[nodiscard]] static Vec2f tileToPixel(Vec2i pos);
 
 private:
     void defineMazeTileRegions();

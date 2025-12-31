@@ -56,10 +56,6 @@ public:
     // Get the underlying texture
     [[nodiscard]] SDL_Texture* getTexture() const { return m_texture.get(); }
 
-    // Get atlas dimensions
-    [[nodiscard]] i32 getWidth() const { return m_width; }
-    [[nodiscard]] i32 getHeight() const { return m_height; }
-
 private:
     struct TextureDeleter {
         void operator()(SDL_Texture* texture) const {
@@ -71,8 +67,6 @@ private:
 
     std::unique_ptr<SDL_Texture, TextureDeleter> m_texture;
     std::unordered_map<std::string, SpriteRegion> m_regions;
-    i32 m_width{};
-    i32 m_height{};
 };
 
 }  // namespace pacman

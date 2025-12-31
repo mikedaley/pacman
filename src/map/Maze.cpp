@@ -217,16 +217,4 @@ Vec2i Maze::pixelToTile(f32 x, f32 y) {
     return {static_cast<i32>(x) / TILE_SIZE, static_cast<i32>(y) / TILE_SIZE};
 }
 
-Vec2i Maze::pixelToTile(Vec2f pos) {
-    return pixelToTile(pos.x, pos.y);
-}
-
-Vec2f Maze::tileToPixel(i32 x, i32 y) {
-    return {static_cast<f32>(x * TILE_SIZE), static_cast<f32>(y * TILE_SIZE)};
-}
-
-Vec2f Maze::tileToPixel(Vec2i pos) {
-    return tileToPixel(pos.x, pos.y);
-}
-
 }  // namespace pacman

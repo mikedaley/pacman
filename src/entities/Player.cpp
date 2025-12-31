@@ -91,18 +91,7 @@ void Player::update(f32 deltaTime) {
 }
 
 void Player::render(Renderer& renderer) {
-    if (m_visible) {
-        m_sprite.render(renderer);
-    }
-}
-
-void Player::setPosition(Vec2f pos) {
-    m_position = pos;
-    m_sprite.setPosition(pos);
-}
-
-void Player::setPosition(f32 x, f32 y) {
-    setPosition(Vec2f{x, y});
+    m_sprite.render(renderer);
 }
 
 Vec2i Player::getTile() const {
@@ -190,10 +179,6 @@ void Player::updateDeathAnimation(f32 deltaTime) {
 
 bool Player::isDeathAnimationComplete() const {
     return m_playingDeathAnim && m_deathAnimTimer >= DEATH_ANIM_FRAME_TIME * DEATH_ANIM_FRAMES;
-}
-
-i32 Player::getDeathAnimFrame() const {
-    return m_sprite.getCurrentFrame();
 }
 
 bool Player::canMoveInDirection(Direction dir) const {

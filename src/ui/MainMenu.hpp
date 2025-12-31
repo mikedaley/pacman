@@ -55,7 +55,6 @@ private:
 
     // Menu state
     i32 m_selectedPlayers{1};  // 1 or 2 players
-    f32 m_animTimer{0.0f};
     f32 m_blinkTimer{0.0f};
     bool m_showCursor{true};
 

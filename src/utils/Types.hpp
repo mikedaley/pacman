@@ -28,36 +28,7 @@ struct Vec2 {
     constexpr Vec2(T x, T y) : x(x), y(y) {}
 
     constexpr Vec2 operator+(const Vec2& other) const { return {x + other.x, y + other.y}; }
-    constexpr Vec2 operator-(const Vec2& other) const { return {x - other.x, y - other.y}; }
     constexpr Vec2 operator*(T scalar) const { return {x * scalar, y * scalar}; }
-    constexpr Vec2 operator/(T scalar) const { return {x / scalar, y / scalar}; }
-
-    constexpr Vec2& operator+=(const Vec2& other) {
-        x += other.x;
-        y += other.y;
-        return *this;
-    }
-
-    constexpr Vec2& operator-=(const Vec2& other) {
-        x -= other.x;
-        y -= other.y;
-        return *this;
-    }
-
-    constexpr Vec2& operator*=(T scalar) {
-        x *= scalar;
-        y *= scalar;
-        return *this;
-    }
-
-    constexpr Vec2& operator/=(T scalar) {
-        x /= scalar;
-        y /= scalar;
-        return *this;
-    }
-
-    constexpr bool operator==(const Vec2& other) const { return x == other.x && y == other.y; }
-    constexpr bool operator!=(const Vec2& other) const { return !(*this == other); }
 };
 
 using Vec2i = Vec2<i32>;

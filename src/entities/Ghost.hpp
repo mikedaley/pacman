@@ -42,17 +42,10 @@ public:
     void render(Renderer& renderer);
 
     // Position management
-    void setPosition(Vec2f pos);
-    void setPosition(f32 x, f32 y);
     [[nodiscard]] Vec2f getPosition() const { return m_position; }
     [[nodiscard]] Vec2i getTile() const;
 
-    // Direction
-    void setDirection(Direction dir);
-    [[nodiscard]] Direction getDirection() const { return m_direction; }
-
     // State management
-    void setState(GhostState state);
     [[nodiscard]] GhostState getState() const { return m_state; }
     void setFrightened();
     void setEaten();          // Called when Pacman eats this ghost
@@ -92,9 +85,6 @@ protected:
     [[nodiscard]] Direction chooseDirection(Vec2i targetTile);
     [[nodiscard]] f32 getSpeed() const;
     [[nodiscard]] Vec2f getTileCenter(i32 tileX, i32 tileY) const;
-
-    // Check if at an intersection (multiple paths available)
-    [[nodiscard]] bool isAtIntersection() const;
 
     Sprite m_sprite;
     const Maze& m_maze;

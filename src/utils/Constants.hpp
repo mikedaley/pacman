@@ -42,27 +42,9 @@ inline constexpr f32 GHOST_TUNNEL_SPEED = BASE_SPEED * 0.40f;      // ~30.3 pixe
 inline constexpr f32 FRIGHTENED_DURATION = 6.0f;    // seconds
 inline constexpr f32 FRIGHTENED_FLASH_TIME = 2.0f;  // seconds before end to start flashing
 inline constexpr f32 GHOST_FLASH_SPEED = 20.0f;     // frames per second for flashing animation
-inline constexpr f32 SCATTER_DURATION = 7.0f;       // seconds
-inline constexpr f32 CHASE_DURATION = 20.0f;        // seconds
-inline constexpr f32 LEVEL_START_DELAY = 2.0f;      // seconds
 
 // Scoring
 inline constexpr i32 SCORE_PELLET = 10;
 inline constexpr i32 SCORE_POWER_PELLET = 50;
-inline constexpr i32 SCORE_GHOST_BASE = 200;  // Doubles for each ghost eaten in sequence
-inline constexpr i32 SCORE_FRUIT_CHERRY = 100;
-inline constexpr i32 SCORE_EXTRA_LIFE = 10000;
-
-// Colors (RGBA)
-namespace colors {
-inline constexpr u32 BLACK = 0x000000FF;
-inline constexpr u32 WHITE = 0xFFFFFFFF;
-inline constexpr u32 YELLOW = 0xFFFF00FF;
-inline constexpr u32 RED = 0xFF0000FF;
-inline constexpr u32 PINK = 0xFFB8FFFF;
-inline constexpr u32 CYAN = 0x00FFFFFF;
-inline constexpr u32 ORANGE = 0xFFB851FF;
-inline constexpr u32 BLUE = 0x2121DEFF;
-}  // namespace colors
 
 }  // namespace pacman::constants

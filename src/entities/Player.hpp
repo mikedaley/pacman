@@ -28,15 +28,10 @@ public:
     void render(Renderer& renderer);
 
     // Position management
-    void setPosition(Vec2f pos);
-    void setPosition(f32 x, f32 y);
-    [[nodiscard]] Vec2f getPosition() const { return m_position; }
     [[nodiscard]] Vec2i getTile() const;
 
     // Direction control
     void setDesiredDirection(Direction dir);
-    [[nodiscard]] Direction getDirection() const { return m_direction; }
-    [[nodiscard]] Direction getDesiredDirection() const { return m_desiredDirection; }
 
     // Reset player to starting position
     void reset();
@@ -46,11 +41,6 @@ public:
     void playDeathAnimation();
     void updateDeathAnimation(f32 deltaTime);
     [[nodiscard]] bool isDeathAnimationComplete() const;
-    [[nodiscard]] i32 getDeathAnimFrame() const;
-
-    // Visibility
-    void setVisible(bool visible) { m_visible = visible; }
-    [[nodiscard]] bool isVisible() const { return m_visible; }
 
     // Death animation constants
     static constexpr f32 DEATH_ANIM_FRAME_TIME = 0.1f;
@@ -70,7 +60,6 @@ private:
     Direction m_desiredDirection{Direction::None};
     Direction m_lastAnimDirection{Direction::None};
 
-    bool m_visible{true};
     bool m_playingDeathAnim{false};
     f32 m_deathAnimTimer{0.0f};
 };

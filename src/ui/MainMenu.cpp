@@ -59,8 +59,6 @@ bool MainMenu::processInput(SDL_Event& event) {
 }
 
 void MainMenu::update(f32 deltaTime) {
-    m_animTimer += deltaTime;
-
     // Blink cursor
     m_blinkTimer += deltaTime;
     if (m_blinkTimer >= BLINK_INTERVAL) {
@@ -162,7 +160,6 @@ void MainMenu::renderCredits(Renderer& renderer) {
 
 void MainMenu::reset() {
     m_selectedPlayers = 1;
-    m_animTimer = 0.0f;
     m_blinkTimer = 0.0f;
     m_showCursor = true;
 }

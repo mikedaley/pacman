@@ -111,22 +111,4 @@ void BitmapFont::drawText(Renderer& renderer, std::string_view text, i32 x, i32 
     }
 }
 
-void BitmapFont::drawNumber(Renderer& renderer, i32 number, i32 x, i32 y, i32 minDigits,
-                            FontColor color) const {
-    std::ostringstream oss;
-    oss << number;
-    std::string numStr = oss.str();
-
-    // Pad with spaces if needed
-    while (static_cast<i32>(numStr.length()) < minDigits) {
-        numStr = " " + numStr;
-    }
-
-    drawText(renderer, numStr, x, y, color);
-}
-
-i32 BitmapFont::getTextWidth(std::string_view text) const {
-    return static_cast<i32>(text.length()) * CHAR_WIDTH;
-}
-
 }  // namespace pacman

@@ -35,13 +35,6 @@ TextureAtlas::TextureAtlas(SDL_Renderer* renderer, std::string_view imagePath)
 
     // Enable alpha blending for transparency
     SDL_SetTextureBlendMode(m_texture.get(), SDL_BLENDMODE_BLEND);
-
-    // Query texture dimensions
-    f32 width{};
-    f32 height{};
-    SDL_GetTextureSize(m_texture.get(), &width, &height);
-    m_width = static_cast<i32>(width);
-    m_height = static_cast<i32>(height);
 }
 
 void TextureAtlas::defineRegion(std::string_view name, i32 x, i32 y, i32 w, i32 h) {

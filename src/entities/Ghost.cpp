@@ -270,32 +270,10 @@ void Ghost::render(Renderer& renderer) {
     m_sprite.render(renderer);
 }
 
-void Ghost::setPosition(Vec2f pos) {
-    m_position = pos;
-    m_sprite.setPosition(pos);
-}
-
-void Ghost::setPosition(f32 x, f32 y) {
-    setPosition(Vec2f{x, y});
-}
-
 Vec2i Ghost::getTile() const {
     constexpr f32 HALF_SPRITE = 8.0f;
     return Maze::pixelToTile(m_position.x + HALF_SPRITE,
                              m_position.y + HALF_SPRITE - constants::MAZE_OFFSET_Y);
-}
-
-void Ghost::setDirection(Direction dir) {
-    if (dir != m_direction) {
-        m_direction = dir;
-        updateAnimation();
-    }
-}
-
-void Ghost::setState(GhostState state) {
-    m_state = state;
-    m_stateTimer = 0.0f;
-    updateAnimation();
 }
 
 void Ghost::setFrightened() {
@@ -317,7 +295,6 @@ void Ghost::setEaten() {
     // Transition to Eaten state - ghost is invisible, score sprite shown
     m_state = GhostState::Eaten;
     m_stateTimer = 0.0f;
-    // Don't update animation - ghost sprite won't be rendered in Eaten state
 }
 
 void Ghost::transitionToEyes() {
@@ -503,23 +480,6 @@ Vec2f Ghost::getTileCenter(i32 tileX, i32 tileY) const {
     return Vec2f{static_cast<f32>(tileX * constants::TILE_SIZE + constants::TILE_SIZE / 2),
                  static_cast<f32>(tileY * constants::TILE_SIZE + constants::TILE_SIZE / 2 +
                                   constants::MAZE_OFFSET_Y)};
-}
-
-bool Ghost::isAtIntersection() const {
-    Vec2i currentTile = getTile();
-    i32 availablePaths = 0;
-
-    if (m_maze.isWalkable(currentTile.x, currentTile.y - 1))
-        ++availablePaths;
-    if (m_maze.isWalkable(currentTile.x, currentTile.y + 1))
-        ++availablePaths;
-    if (m_maze.isWalkable(currentTile.x - 1, currentTile.y))
-        ++availablePaths;
-    if (m_maze.isWalkable(currentTile.x + 1, currentTile.y))
-        ++availablePaths;
-
-    // An intersection has more than 2 available paths
-    return availablePaths > 2;
 }
 
 }  // namespace pacman

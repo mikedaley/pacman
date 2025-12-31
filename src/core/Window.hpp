@@ -24,11 +24,6 @@ public:
     Window& operator=(Window&&) noexcept = default;
 
     [[nodiscard]] SDL_Window* get() const { return m_window.get(); }
-    [[nodiscard]] i32 width() const { return m_width; }
-    [[nodiscard]] i32 height() const { return m_height; }
-    [[nodiscard]] bool isValid() const { return m_window != nullptr; }
-
-    void setTitle(std::string_view title);
 
 private:
     struct WindowDeleter {
@@ -40,8 +35,6 @@ private:
     };
 
     std::unique_ptr<SDL_Window, WindowDeleter> m_window;
-    i32 m_width;
-    i32 m_height;
 };
 
 }  // namespace pacman

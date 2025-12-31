@@ -279,7 +279,7 @@ void Game::update(f32 deltaTime) {
 
 void Game::render() {
     // Clear with black background
-    m_renderer->setDrawColor(constants::colors::BLACK);
+    m_renderer->setDrawColor(0, 0, 0);
     m_renderer->clear();
 
     // Render based on app state

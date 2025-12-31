@@ -34,13 +34,6 @@ public:
     void drawText(Renderer& renderer, std::string_view text, i32 x, i32 y,
                   FontColor color = FontColor::White) const;
 
-    // Render a number (right-aligned, padded with spaces)
-    void drawNumber(Renderer& renderer, i32 number, i32 x, i32 y, i32 minDigits = 1,
-                    FontColor color = FontColor::White) const;
-
-    // Get width of text in pixels
-    [[nodiscard]] i32 getTextWidth(std::string_view text) const;
-
 private:
     void defineCharacterRegions();
     [[nodiscard]] i32 getCharIndex(char c) const;
