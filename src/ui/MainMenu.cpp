@@ -160,8 +160,9 @@ void MainMenu::updateChaseSequence(f32 deltaTime) {
             m_superPacmanSprite.setPosition(m_pacmanChaseX, CHASE_Y - 8.0f);
             m_frightenedGhostSprite.setPosition(m_ghostChaseX, CHASE_Y);
 
-            // When ghost exits screen right, advance state
-            if (m_ghostChaseX > SCREEN_WIDTH + 20.0f) {
+            // When Super Pac-Man exits screen right, advance state
+            // Super Pac-Man is 32 pixels wide, so wait until fully off screen
+            if (m_pacmanChaseX > SCREEN_WIDTH + 32.0f) {
                 m_chasePhase = ChasePhase::Done;
                 advanceToNextState();
             }
